@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shapes Moving with HTML5 Canvas</title>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="300"
+     style="border: 1px solid black;"></canvas>
+
+  <script>
+    // Get the canvas and its 2D context
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set the initial position of the shape
+    let x = 150;
+    let y = 100;
+    const shapeSize = 50;
+    const moveSpeed = 5;
+
+    // Function to draw the shape on the canvas
+    function drawShape() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgb(255, 0,0)";
+        ctx.fillRect(x, y, shapeSize, shapeSize);
+    }
+
+    // Function to handle keyboard events
+    function handleKeyDown(event) {
+        // Arrow keys (left, right, up, down) have key codes 37, 39, 38, 40
+        switch (event.keyCode) {
+            case 37: // Left arrow
+                x -= moveSpeed;
+                break;
+            case 39: // Right arrow
+                x += moveSpeed;
+                break;
+            case 38: // Up arrow
+                y -= moveSpeed;
+                break;
+            case 40: // Down arrow
+                y += moveSpeed;
+                break;
+        }
+    }
+
+    // Event listener for keydown events
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Function to update the canvas
+    function updateCanvas() {
+        drawShape();
+        requestAnimationFrame(updateCanvas);
+    }
+
+    // Start the animation
+    updateCanvas();
+</script>
+</body>
+</html>
