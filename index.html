@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">  <!-- 기본언어 : 영어 -->
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" /> <!-- 페이지 언어 인코딩 형식 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- 화면크기에 따라 보여지는 크기 맞추기 -->
   <title>Web Animation(canvas_js_css)[1단원-3]</title>
   <style>
+    /* 페이지 전체 설정 */
     body {
       margin: 0;
       padding: 0;
       text-align: center;
       font-family: sans-serif;
     }
-
+    /* 애니메이션 화면 설정 */
     #canvas {
       background: #DCD7C9;
       display: block;
@@ -28,20 +29,26 @@
   </style>
 </head>
 <body>
+  <!-- 애니메이션 화면 만들기 -->
 	<canvas id="canvas"></canvas>
   <script>
+    // 캔버스 요소 JS 변수만들기
     const drawingBoard = document.getElementById('canvas');
+    // 캔버스에 2D그림을 그리는 도구 변수만들기
     const drawingPen = drawingBoard.getContext('2d');
 
     // 캔버스 크기를 CSS와 맞춰줌 (중요!)
     drawingBoard.width = drawingBoard.clientWidth;
     drawingBoard.height = drawingBoard.clientHeight;
 
+    // 화면 가운데 위치
     let x = (drawingBoard.width - 10) / 2;
     let y = (drawingBoard.height - 10) / 2;
 
+    // 주인공 이동속도
     const moveAmount = 5;
 
+    // 주인공 이동함수
     function moveRight() {
       x = x + moveAmount;
     }
@@ -58,17 +65,41 @@
       y = y - moveAmount;
     }
 
+    //★1_4 : 주인공 이동제한
+    function move_limit(){
+      if (x < 0) { //왼쪽이동제한
+        x = 0;
+      }
+
+
+
+
+    }
+
+    //★1_4 : 캔버스 왼쪽 상단에 텍스트 출력함수
+    function drawCoordinate() {
+      drawingPen.fillStyle = 'black';
+      drawingPen.font = '10px sans-serif';
+      drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);  //★1_4 : 주인공 좌표출력
+    }
+
+    //주인공출력함수
     function drawHero() {
       drawingPen.fillStyle = 'black';
       drawingPen.fillRect(x, y, 10, 10);
     }
 
+    // 화면에 출력하기
     function draw() {
-      drawingPen.clearRect(0, 0, canvas.width, canvas.height);
-      drawHero();
+      drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);  //★1_4 : 캔버스 왼쪽 상단에 텍스트 출력
+      drawingPen.clearRect(0, 0, canvas.width, canvas.height); //화면지우기
+      drawHero(); //주인공출력함수호출
+
+      move_limit();  //★1_4 : 주인공 이동제한 함수호출
+      drawCoordinate();  //★1_4 : 텍스트 출력 함수호출
     }
 
-    setInterval(draw, 16); // 60 FPS
+    setInterval(draw, 16); // 60FPS
 	
     // PC 방향키 조작
     document.addEventListener('keydown', (e) => {
