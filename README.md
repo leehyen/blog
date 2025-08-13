@@ -1,3 +1,3 @@
-# blog
+# web_animation
 
-안녕하세요
+canvas(html), css, html
