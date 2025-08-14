@@ -19,9 +19,9 @@
       margin: 0 auto;
     }
 
-    /* ★1_5 : PC 안내 문구 기본은 숨김 */
+    /* PC 안내 문구 기본은 숨김 */
     .pc-guide {
-        display: none;
+        display: none; /* 화면에 보이지 않게함 */
         margin-top: 10px;  
         font-size: 16px; 
         color: #333; 
@@ -36,28 +36,28 @@
         }
 
         .pc-guide {
-            display: block;  
+            display: block;  /* pc-guide를 PC에서 접속시 보이게함 */
         }      
     }  
 
-    /* ★1_5 : 버튼들을 감싸는 div 숨기기 (PC에서는 안 보이게하고 스마트폰에서 접속이 보임) */
+    /* 버튼들을 감싸는 div 숨기기 (PC에서는 안 보이게하고 스마트폰에서 접속이 보임) */
     .controls {
-        display: none; 
+        display: none;
         margin-top: 10px; 
     }
 
-    /* ★1_5 : 스마트폰에서 보여질 버튼 모양 설정 */
+    /* 스마트폰에서 보여질 버튼 모양 설정 */
     .controls button {
         font-size: 18px; 
-        padding: 10px 20px;
-        margin: 5px; 
+        padding: 10px 20px; 
+        margin: 5px;
     }
 
-    /* ★1_5 : 화면이 작을 때 (스마트폰 등에서 보인다면 아래 코드동작)
+    /* 화면이 작을 때 (스마트폰 등에서 보인다면 아래 코드동작)
     */
     @media (max-width: 768px) {
         #canvas {
-            width: 100vw;
+            width: 100vw; 
             height: 100vw; 
         }
         .controls {
@@ -73,7 +73,7 @@
     <!-- 애니메이션 화면 만들기 -->
     <canvas id="canvas"></canvas>
 
-    <!-- ★1_5 : 애니메이션 화면 만들기 : 스마트폰에서 접속 할 때만 controls이 보이게됨-->
+    <!-- 애니메이션 화면 만들기 : 스마트폰에서 접속 할 때만 controls이 보이게됨-->
     <div class="controls">
         <button id="leftBtn">◀</button>
         <button id="rightBtn">▶</button>
@@ -81,7 +81,7 @@
         <button id="downBtn">▼</button>
     </div>
 
-    <!-- ★1_5 : PC 전용 안내 문구 -->
+    <!-- PC 전용 안내 문구 -->
     <div class="pc-guide">
         PC에서 접속했습니다. 방향키로 이동하세요.<br>
         스마트폰은 접속 시 보이는 버튼으로 이동하세요.
@@ -107,64 +107,82 @@
 
         // 주인공 이동함수
         function moveRight() {
-        x = x + moveAmount;
+            x = x + moveAmount;
         }
 
         function moveLeft() {
-        x = x - moveAmount;
+            x = x - moveAmount;
         }
 
         function moveDown() {
-        y = y + moveAmount;
+            y = y + moveAmount;
         }
 
         function moveUp() {
-        y = y - moveAmount;
+            y = y - moveAmount;
         }
 
-        //★1_4 : 주인공 이동제한
+        //주인공 이동제한
         function move_limit(){
-        if (x < 0) { //왼쪽이동제한
-            x = 0;
-        }
+            if (x < 0) { //왼쪽이동제한
+                x = 0;
+            }
         }
 
         //캔버스 왼쪽 상단에 텍스트 출력함수
         function drawCoordinate() {
-        drawingPen.fillStyle = 'black';
-        drawingPen.font = '10px sans-serif';
-        drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);
+            drawingPen.fillStyle = 'black';
+            drawingPen.font = '10px sans-serif';
+            drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);
         }
 
         //주인공출력함수
         function drawHero() {
-        drawingPen.fillStyle = 'black';
-        drawingPen.fillRect(x, y, 10, 10);
+            drawingPen.fillStyle = 'black';
+            drawingPen.fillRect(x, y, 10, 10);
         }
+
+        // ★1_6 : 방향키 눌림 상태 추적
+        const keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+
+        // ★1_6 : 키보드를 keydown 시 처리
+        document.addEventListener('keydown', (e) => {
+            if (keys.hasOwnProperty(e.key)) { 
+                keys[e.key] = true; 
+            }
+        });
+
+        // ★1_6 : 키보드를 keyup 시 처리
+        document.addEventListener('keyup', (e) => {
+            if (keys.hasOwnProperty(e.key)) { 
+                keys[e.key] = false; 
+            }
+        });         
 
         // 화면에 출력하기
         function draw() {
-        drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);
-        drawingPen.clearRect(0, 0, canvas.width, canvas.height); //화면지우기
-        drawHero(); //주인공출력함수호출
+            drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);
+            drawingPen.clearRect(0, 0, canvas.width, canvas.height); //화면지우기
+            drawHero(); //주인공출력함수호출
 
-        move_limit();  //주인공 이동제한 함수호출
-        drawCoordinate();  //텍스트 출력 함수호출
+            move_limit();  //주인공 이동제한 함수호출
+            drawCoordinate();  //텍스트 출력 함수호출
+
+            // ★1_6 : 키가 눌려있는 동안 계속 이동(키보드 인식 속도 향상으로 이동을 부드럽게 변경
+            if (keys.ArrowLeft) moveLeft(); 
+            if (keys.ArrowRight) moveRight(); 
+            if (keys.ArrowUp) moveUp(); 
+            if (keys.ArrowDown) moveDown();
         }
-
+       
         setInterval(draw, 16); // 60FPS
-        
-        // PC 방향키 조작
-        document.addEventListener('keydown', (e) => {
-        switch (e.key) {
-            case 'ArrowLeft': moveLeft(); break;
-            case 'ArrowRight': moveRight(); break;
-            case 'ArrowUp': moveUp(); break;
-            case 'ArrowDown': moveDown(); break;
-        }
-        });
 
-        // ★1_5 : 버튼 이벤트 연결 : 버튼을 선택하면 해당 함수를 호출해서 주인공 이동     
+        // 버튼 이벤트 연결 : 버튼을 선택하면 해당 함수를 호출해서 주인공 이동    
         document.getElementById('leftBtn').addEventListener('click', moveLeft);
         document.getElementById('rightBtn').addEventListener('click', moveRight);
         document.getElementById('upBtn').addEventListener('click', moveUp);
