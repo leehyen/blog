@@ -41,30 +41,56 @@
     }  
 
     /* 버튼들을 감싸는 div 숨기기 (PC에서는 안 보이게하고 스마트폰에서 접속이 보임) */
+    /* ★1_7 : 코드추가 및 수정, 스마트폰에서 보여질 버튼 모양 설정 */
     .controls {
-        display: none;
-        margin-top: 10px; 
+        display: none; /* 화면에 보이지 않게함 */
+        margin-top: 10px;
+        flex-direction: column;
+        align-items: center;
+        
     }
 
-    /* 스마트폰에서 보여질 버튼 모양 설정 */
-    .controls button {
-        font-size: 18px; 
-        padding: 10px 20px; 
-        margin: 5px;
+     /* ★1_7 : 코드추가 및 수정, 스마트폰에서 보여질 버튼 모양 설정 */
+    .controls .row {
+        display: flex;
+        justify-content: center; 
     }
+
+    /* ★1_7 : 코드추가 및 수정, 스마트폰에서 보여질 버튼 모양 설정 */
+    .controls button {
+        font-size: 24px;
+        padding: 15px 20px;
+        margin: 5px;
+        min-width: 60px;
+        border-radius: 10px; 
+        border: none; /* 선두께 없음 */
+        background-color: #333;
+        color: white;
+        touch-action: none; /* ★1_7 : 터치 딜레이 방지 */
+    }
+
+    /* ★1_7 : 버튼을 누르고 있을 때(active) 아래 지정한 배경색으로 변경 */
+    .controls button:active {
+        background-color: #555;
+    }    
 
     /* 화면이 작을 때 (스마트폰 등에서 보인다면 아래 코드동작)
+        화면의 폭이 최대 768픽셀보다 이하이면 아래 css동작함 아니면 위 PC용 CSS @media (min-width: 769px) 동작함
+        어 최근 스마트폰의 해상도는 PC보다도 좋은 경우가 많은데 768픽셀보다 작으면 스마트폰이라니?
+        ★이유 : 스마트폰의 물리적인 해상도는 더 크지만, 화면을 작게 보이도록 하기 위해 **디바이스 픽셀 비율(DPR, devicePixelRatio)**을 사용함
+        아이폰13의 가로해상도가 1170픽셀인데 CSS픽셀로는 1170/3=390픽셀임
+        현재 기기로 보아도 768 CSS픽셀이면 모든 스마트폰에서 접속하는 것으로 판단함 ^^
     */
     @media (max-width: 768px) {
         #canvas {
-            width: 100vw; 
-            height: 100vw; 
+            width: 100vw; /* 스마트폰 화면 canvas 가로 전체 크기로함*/
+            height: 100vw;  /* 화면 canvas 세로 = 가로 (정사각형) */
         }
         .controls {
-            display: block;
+            display: block; /* 스마트폰에서 접속시 controls을 보이게함  */
         }
         .pc-guide {
-            display: none; 
+            display: none;  /* pc-guide를 스마트폰 접속시 숨김 */
         }         
     }
   </style>
@@ -74,21 +100,28 @@
     <canvas id="canvas"></canvas>
 
     <!-- 애니메이션 화면 만들기 : 스마트폰에서 접속 할 때만 controls이 보이게됨-->
+    <!-- ★1_7 : 아래처럼 코드를 변경하자, 배치 모양을 키보드 방향키 처럼 변경-->
     <div class="controls">
-        <button id="leftBtn">◀</button>
-        <button id="rightBtn">▶</button>
-        <button id="upBtn">▲</button>
-        <button id="downBtn">▼</button>
-    </div>
+        <div class="row">
+            <button id="upBtn">↑</button>
+        </div>
+        <div class="row">
+            <button id="leftBtn">←</button>
+            <button id="downBtn">↓</button>
+            <button id="rightBtn">→</button>
+        </div>
+    </div>    
 
     <!-- PC 전용 안내 문구 -->
     <div class="pc-guide">
         PC에서 접속했습니다. 방향키로 이동하세요.<br>
         스마트폰은 접속 시 보이는 버튼으로 이동하세요.
+        console.log("pc-guide")
     </div>
 
 
     <script>
+        console.log("<script>start")
         // 캔버스 요소 JS 변수만들기
         const drawingBoard = document.getElementById('canvas');
         // 캔버스에 2D그림을 그리는 도구 변수만들기
@@ -142,29 +175,31 @@
             drawingPen.fillRect(x, y, 10, 10);
         }
 
-        // ★1_6 : 방향키 눌림 상태 추적
-        const keys = {
-            ArrowLeft: false,
-            ArrowRight: false,
-            ArrowUp: false,
-            ArrowDown: false
+        // 방향키 눌림 상태 추적
+        const keys = { 
+            //****이건 Keycode(키보드)정의되어있는 KeyboardEvent.key Value
+            //참고 : https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+            PageDown: false,
+            Home: false,
+            End: false,
+            Delete:false,
         };
 
-        // ★1_6 : 키보드를 keydown 시 처리
+        // 키보드를 keydown 시 처리
         document.addEventListener('keydown', (e) => {
             if (keys.hasOwnProperty(e.key)) { 
-                keys[e.key] = true; 
+                keys[e.key] = true;
             }
         });
 
-        // ★1_6 : 키보드를 keyup 시 처리
+        // 키보드를 keyup 시 처리
         document.addEventListener('keyup', (e) => {
             if (keys.hasOwnProperty(e.key)) { 
                 keys[e.key] = false; 
             }
         });         
 
-        // 화면에 출력하기
+        // 화면에 출력하기 *** 계속 호출되고있다. setInterval에 의해서
         function draw() {
             drawingPen.fillText(`x: ${x}  y: ${y}`, 10, 20);
             drawingPen.clearRect(0, 0, canvas.width, canvas.height); //화면지우기
@@ -173,20 +208,43 @@
             move_limit();  //주인공 이동제한 함수호출
             drawCoordinate();  //텍스트 출력 함수호출
 
-            // ★1_6 : 키가 눌려있는 동안 계속 이동(키보드 인식 속도 향상으로 이동을 부드럽게 변경
-            if (keys.ArrowLeft) moveLeft(); 
-            if (keys.ArrowRight) moveRight(); 
-            if (keys.ArrowUp) moveUp(); 
-            if (keys.ArrowDown) moveDown();
+            //****키보드 KeyboardEvent.key Value
+            // 키가 눌려있는 동안 계속 이동(키보드 인식 속도 향상으로 이동을 부드럽게 변경
+            if (keys.Delete) moveLeft(); // 왼쪽 방향키를 선택해서 keys.ArrowLeft(키보드값이다.) 값이 true일때 처리
+            if (keys.PageDown) moveRight(); 
+            if (keys.Home) moveUp(); 
+            if (keys.End) moveDown(); 
         }
        
         setInterval(draw, 16); // 60FPS
 
-        // 버튼 이벤트 연결 : 버튼을 선택하면 해당 함수를 호출해서 주인공 이동    
-        document.getElementById('leftBtn').addEventListener('click', moveLeft);
-        document.getElementById('rightBtn').addEventListener('click', moveRight);
-        document.getElementById('upBtn').addEventListener('click', moveUp);
-        document.getElementById('downBtn').addEventListener('click', moveDown);        
+        // ★1_7 : **** 모바일 버튼을 누르고 있을 때 상태 관리(dom event 호출 될때마다)
+        const setBtnHold = (key, isDown) => {  
+            keys[key] = isDown;
+            console.log("<script>setBtnHold")
+        };        
+    
+        const bindButton = (id, key) => { //*****마우스로 클릭가능한 버튼(id)에 listener 연결
+        //해당 버튼id에 key기능을 부여한다.
+        //addEventListner (dom이벤트,()=>사용자 정의 함수( , )) << 이 이벤트(touchstart,도 아래 사이트에서 참고할 수 있다.
+       // https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Events <<여기서 Touch,mouse 검색 참고 key
+            const btn = document.getElementById(id);//<button>태그의 id
+            btn.addEventListener('touchstart', () => setBtnHold(key, true));
+            btn.addEventListener('touchend', () => setBtnHold(key, false));
+            btn.addEventListener('mousedown', () => setBtnHold(key, true));  // 마우스도 지원
+            btn.addEventListener('mouseup', () => setBtnHold(key, false));
+            btn.addEventListener('mouseleave', () => setBtnHold(key, false)); // 끌고 나갈 때
+                //마우스로 해당 버튼을 클릭할때, 이벤트가호출된다.
+            console.log("<script>bindButton")
+        };
+        //*****마우스로 클릭가능한 버튼(id)에 키보드의 명령어listener 연결
+        // ★1_7 : 마우스로 각 버튼을 선택시 키보드 방향키 동작 연결
+        bindButton("leftBtn", "Delete"); // ★1_7 : 왼쪽 버튼 
+        bindButton("rightBtn", "PageDown"); // ★1_7 : 오른쪽 버튼 
+        bindButton("upBtn", "Home"); // ★1_7 : 위쪽 버튼 
+        bindButton("downBtn", "End");   // ★1_7 : 아래쪽 버튼  
+
+        console.log("<script>end")
   </script>  
 </body>
-</html>
+</html> 
